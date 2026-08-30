@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>士为大酒店 · 酒店实习模拟</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:100%;height:100%;font-family:'Microsoft YaHei','PingFang SC','SimHei',sans-serif;background:#0d0d1a;color:#f5f5f5;overflow-x:hidden}
+.sbg{position:fixed;inset:0;background:#0d0d1a;z-index:0;overflow:hidden}
+.ss{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 10% 10%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 30% 20%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 50% 5%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 70% 15%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 90% 8%,rgba(255,255,255,.3),transparent);animation:tw 3s infinite alternate}
+@keyframes tw{0%{opacity:.4}100%{opacity:1}}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.sr{width:100%;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;position:relative}
+.cs{width:480px;max-width:90vw;height:220px;background:#1a1a3a;border:2px solid #3a3a5a;border-radius:12px;margin-bottom:20px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.er{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:center;gap:16px;font-size:24px;animation:fe 3s ease-in-out infinite}
+@keyframes fe{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* === 像素风酒店 === */
+.htl{position:relative;width:180px;height:170px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+/* 屋顶 */
+.roof{width:160px;height:28px;background:#f4d03f;clip-path:polygon(8% 100%,92% 100%,100% 0,0 0);display:flex;align-items:center;justify-content:center;position:relative;z-index:2}
+/* 招牌文字 */
+.sign-txt{font-size:8px;color:#1a1a3a;font-weight:bold;letter-spacing:1.5px;font-family:'SimHei'}
+/* 大楼主体 */
+.bld{width:140px;height:90px;background:#2a2f4a;border:3px solid #f4d03f;border-bottom:none;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(4,1fr);gap:2px;padding:6px 4px 0}
+/* 窗户 */
+.win{background:#f4d03f;border-radius:1px;animation:wf 2.5s infinite alternate}
+.off{background:#1a1a3a;opacity:.4}
+@keyframes wf{0%{opacity:.6}50%{opacity:1}100%{opacity:.5}}
+/* 底部基座 */
+.base{width:140px;height:36px;background:#2a2f4a;border:3px solid #f4d03f;display:flex;align-items:center;justify-content:center;position:relative}
+/* 门（最下方，嵌入基座） */
+.door{width:28px;height:26px;background:#1a1a3a;border:2px solid #f4d03f;border-bottom:none;position:absolute;top:5px;left:50%;transform:translateX(-50%);z-index:3}
+.door-glass{width:10px;height:8px;background:#4fc3f7;opacity:.7;margin:2px auto 0;border-radius:1px}
+/* 地面 */
+.ground{width:180px;height:6px;background:#3a3a5a;border-radius:0 0 4px 4px;margin-top:-2px}
+/* 左右装饰树 */
+.tree{position:absolute;bottom:8px;display:flex;flex-direction:column;align-items:center}
+.tree-l{left:-20px}.tree-r{right:-20px}
+.tree-trunk{width:6px;height:16px;background:#8B6914}
+.tree-crown{width:20px;height:24px;background:#4caf50;border-radius:50% 50% 40% 40%;margin-bottom:-4px}
+/* 星星装饰 */
+.str{position:absolute;font-size:12px;animation:fe 2s ease-in-out infinite}
+.s1{top:5px;left:20px}.s2{top:12px;right:25px}.s3{top:0;right:40px}
+
+.cs2{position:absolute;bottom:6px;left:0;right:0;display:flex;justify-content:center;gap:10px;font-size:14px}
+.tt{font-family:'SimHei';font-size:42px;font-weight:bold;color:#f4d03f;margin-bottom:4px;letter-spacing:6px;text-shadow:0 0 30px rgba(244,208,63,.5),0 2px 4px rgba(0,0,0,.5)}
+.ts{font-size:11px;color:#888;letter-spacing:4px;margin-bottom:24px}
+.bt{background:#f4d03f;color:#0d0d1a;border:none;padding:16px 52px;border-radius:10px;font-size:17px;font-weight:bold;font-family:'SimHei';letter-spacing:4px;cursor:pointer;transition:all .3s;box-shadow:0 4px 24px rgba(244,208,63,.4);margin-bottom:10px}
+.bt:hover{transform:translateY(-3px);box-shadow:0 8px 36px rgba(244,208,63,.6)}
+.tp{font-size:13px;color:#aaa;margin-bottom:8px;font-family:'SimHei'}
+.sr2{display:flex;gap:12px;align-items:center;justify-content:center;margin-bottom:28px}
+.sb{padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;font-family:'SimHei';border:1px solid #3a3a5a;background:rgba(255,255,255,.05);color:#888;transition:all .2s}
+.sb.on{background:rgba(244,208,63,.15);border-color:#f4d03f;color:#f4d03f}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#0a0a1a;border-bottom:2px solid #3a3a5a;position:sticky;top:0;z-index:100}
+.hn{font-size:14px;color:#f4d03f;font-weight:bold;letter-spacing:2px;font-family:'SimHei'}
+.hn small{display:block;font-size:9px;color:#888;letter-spacing:1px}
+.sr3{display:flex;gap:12px;align-items:center}
+.sb2{text-align:center;background:rgba(255,255,255,.05);border:1px solid #3a3a5a;border-radius:4px;padding:4px 8px;min-width:52px}
+.sb2 .l{font-size:8px;color:#888;display:block;text-transform:uppercase}
+.sb2 .v{font-size:14px;font-weight:bold;display:block}
+.vg{color:#f4d03f}.vr{color:#e57373}
+.tw{padding:8px 16px 0}
+.tb{height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
+.tbr{height:100%;border-radius:4px;transition:width .3s;background:#4fc3f7}
+.tbr.mid{background:#f4d03f}
+.tbr.low{background:#e57373}
+.tl{text-align:center;font-size:11px;color:#888;margin-top:2px}
+.main{flex:1;padding:12px 16px;display:flex;flex-direction:column;gap:12px;overflow:hidden;position:relative}
+.ql{font-size:10px;color:#f4d03f;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ql::before,.ql::after{content:'';flex:1;height:1px;background:#3a3a5a}
+.eq{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.ec{background:rgba(255,255,255,.05);border:1px solid #3a3a5a;border-radius:6px;padding:8px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;animation:ci .3s ease-out}
+@keyframes ci{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+.ec:hover{border-color:#f4d03f;background:rgba(244,208,63,.08);transform:translateY(-2px)}
+.ec.ur{border-color:#e57373;animation:up 1s infinite,ci .3s ease-out}
+@keyframes up{0%,100%{box-shadow:0 0 0 0 rgba(229,115,115,.4)}50%{box-shadow:0 0 0 4px rgba(229,115,115,0)}}
+.cy{font-size:26px;display:block;text-align:center;margin-bottom:4px}
+.ct{font-size:11px;font-weight:bold;color:#f5f5f5;display:block;text-align:center;font-family:'SimHei'}
+.cs3{font-size:9px;color:#888;display:block;text-align:center;margin-top:2px}
+.cb{position:absolute;top:4px;right:4px;font-size:9px;padding:1px 4px;border-radius:3px;font-weight:bold}
+.cbu{background:rgba(229,115,115,.3);color:#e57373}
+.cbn{background:rgba(129,199,132,.3);color:#81c784}
+.ae{background:rgba(255,255,255,.05);border:2px solid #3a3a5a;border-radius:8px;padding:16px;animation:su .3s ease-out;max-height:280px;overflow-y:auto;position:relative}
+@keyframes su{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.ah{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.af{width:64px;height:64px;border-radius:8px;overflow:hidden;background:rgba(0,0,0,.4);border:2px solid #3a3a5a;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:48px}
+.at{font-size:14px;font-weight:bold;color:#f4d03f;margin-bottom:2px;font-family:'SimHei'}
+.an{font-size:11px;color:#888;margin-bottom:6px}
+.am{margin-left:auto;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold;flex-shrink:0}
+.ma{background:rgba(229,115,115,.2);color:#e57373}
+.mh{background:rgba(129,199,132,.2);color:#81c784}
+.mn{background:rgba(255,255,255,.1);color:#888}
+.ad{background:rgba(0,0,0,.3);border-left:3px solid #f4d03f;padding:10px 12px;border-radius:0 6px 6px 0;font-size:13px;line-height:1.6;margin-bottom:14px}
+.chs{display:flex;flex-direction:column;gap:8px}
+.cb2{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:#f5f5f5;padding:11px 12px;border-radius:6px;cursor:pointer;font-size:13px;text-align:left;transition:all .15s;font-family:'SimHei';line-height:1.5;display:block;width:100%}
+.cb2:hover{background:rgba(244,208,63,.1);border-color:#f4d03f;transform:translateX(4px)}
+.cb2:active{transform:translateX(2px) scale(.98)}
+.ne{text-align:center;padding:40px 20px;color:#888;background:rgba(255,255,255,.05);border:1px dashed #3a3a5a;border-radius:8px}
+.ne2{font-size:48px;display:block;margin-bottom:8px;animation:bc 2s infinite}
+@keyframes bc{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.ne3{font-size:13px;font-family:'SimHei'}
+.lp{background:rgba(255,255,255,.05);border:1px solid #3a3a5a;border-radius:8px;padding:10px 14px;max-height:90px;overflow-y:auto}
+.lt{font-size:10px;color:#f4d03f;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.ll{font-size:10px;line-height:1.8;color:#888}
+.li{padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.pos{color:#81c784}.neg{color:#e57373}.gold{color:#f4d03f}
+.cb3{position:fixed;top:80px;right:16px;z-index:150;background:rgba(244,208,63,.15);border:1px solid #f4d03f;border-radius:8px;padding:6px 12px;text-align:center;animation:cbi .3s ease-out;display:none}
+@keyframes cbi{from{opacity:0;transform:scale(.8) translateX(20px)}to{opacity:1;transform:scale(1) translateX(0)}}
+.cc{font-size:22px;font-weight:bold;color:#f4d03f}
+.cl{font-size:9px;color:#888;text-transform:uppercase}
+.sp{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:bold;z-index:300;pointer-events:none;opacity:0}
+.sp.anim{animation:sa 1s ease-out forwards}
+@keyframes sa{0%{opacity:1;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-60%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-100%) scale(1)}}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;padding:16px}
+.ov.ac{display:flex}
+.bx{background:#131326;border:2px solid #f4d03f;border-radius:12px;padding:28px 24px;max-width:420px;width:100%;text-align:center;animation:mi .4s ease-out}
+@keyframes mi{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.me{font-size:72px;display:block;margin-bottom:12px}
+.mt{font-size:22px;color:#f4d03f;margin-bottom:8px;font-weight:bold;font-family:'SimHei'}
+.ms{font-size:13px;color:#888;line-height:1.6;margin-bottom:16px}
+.ms2{background:rgba(0,0,0,.4);border-radius:8px;padding:14px;margin-bottom:16px;text-align:left}
+.mst{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}
+.mst .l{color:#888}.mst .v{color:#f4d03f;font-weight:bold}.mst .vg{color:#81c784}.mst .vr{color:#e57373}
+.br{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.btn{padding:10px 20px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;font-family:'SimHei';border:none;transition:all .2s}
+.bp{background:#f4d03f;color:#0d0d1a}.bp:hover{background:#d4a500;transform:translateY(-2px)}
+.es{width:auto;min-width:120px;max-width:330px;height:auto;margin:0 auto 12px;padding:16px 18px;display:flex;align-items:center;justify-content:center;gap:16px;border-radius:12px;font-size:72px}
+/* 结画面：竖向好一个赞手势 + 横向X枚带星奖牌 */
+.tf{width:96px;height:96px;flex-shrink:0;border:3px solid currentColor;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:62px;background:rgba(0,0,0,.32);box-shadow:inset 0 0 18px rgba(0,0,0,.5)}
+.mr{display:flex;flex-direction:row;flex-wrap:wrap;gap:4px;align-items:center;justify-content:center;font-size:32px;line-height:1.1}
+.mr .md{display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.mr5{font-size:27px;gap:2px}
+.sh{animation:shk .5s ease-out}
+@keyframes shk{0%,100%{transform:translateX(0)}10%{transform:translateX(-8px)}20%{transform:translateX(8px)}30%{transform:translateX(-6px)}40%{transform:translateX(6px)}50%{transform:translateX(-4px)}60%{transform:translateX(4px)}70%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+.fl-g{animation:flc .4s ease-out}@keyframes flc{0%{background:rgba(129,199,132,.3)}100%{background:transparent}}
+.fl-r{animation:flw .4s ease-out}@keyframes flw{0%{background:rgba(229,115,115,.3)}100%{background:transparent}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#3a3a5a;border-radius:2px}
+.hi{display:none!important}
+@media(max-width:480px){.sr3{gap:6px}.sb2{min-width:42px;padding:3px 5px}.sb2 .v{font-size:12px}.eq{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}.cy{font-size:22px}.tt{font-size:28px;letter-spacing:3px}.hdr{padding:8px 12px}.cs{height:180px}}
+.praise-banner{position:fixed;z-index:160;background:rgba(244,208,63,.95);color:#0d0d1a;padding:10px 18px;border-radius:8px;font-family:'SimHei';font-size:14px;font-weight:bold;cursor:pointer;box-shadow:0 4px 20px rgba(244,208,63,.5);display:none;white-space:nowrap;pointer-events:all}
+.praise-banner:hover{transform:scale(1.04)}
+.praise-banner.d0{top:20%;animation:banL var(--speed, 7s) linear forwards}
+.praise-banner.d1{top:20%;animation:banR var(--speed, 7s) linear forwards}
+.praise-banner.d2{top:15%;animation:banT var(--speed, 6s) linear forwards}
+.praise-banner.d3{top:auto;bottom:15%;animation:banB var(--speed, 6s) linear forwards}
+@keyframes banL{0%{left:-260px;opacity:1}90%{left:calc(100vw + 260px);opacity:1}100%{left:calc(100vw + 260px);opacity:0;display:none}}
+@keyframes banR{0%{right:-260px;opacity:1}90%{right:calc(100vw + 260px);opacity:1}100%{right:calc(100vw + 260px);opacity:0;display:none}}
+@keyframes banT{0%{top:-60px;opacity:1}90%{top:calc(100vh + 60px);opacity:1}100%{top:calc(100vh + 60px);opacity:0;display:none}}
+@keyframes banB{0%{bottom:-60px;opacity:1}90%{bottom:calc(100vh + 60px);opacity:1}100%{bottom:calc(100vh + 60px);opacity:0;display:none}}
+.countdown-tip{position:absolute;top:6px;right:8px;font-size:10px;color:#e57373;font-family:'SimHei';display:none;z-index:5}
+.combo-popup{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);font-size:20px;font-weight:bold;color:#f4d03f;font-family:'SimHei';z-index:250;pointer-events:none;opacity:0;text-shadow:0 0 10px rgba(244,208,63,.8)}
+.combo-popup.anim{animation:comboAnim .8s ease-out forwards}
+@keyframes comboAnim{0%{opacity:1;transform:translate(-50%,-50%) scale(.6)}40%{opacity:1;transform:translate(-50%,-70%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-100%) scale(1)}}
+</style>
+</head>
+<body>
+<div class="sbg"><div class="ss"></div></div>
+<div class="app" id="app">
+  <div id="startScreen" class="sr">
+    <div class="cs">
+      <div class="er"><span>📋</span><span>🧹</span><span>⭐</span><span>🚨</span><span>🏨</span></div>
+
+      <!-- 像素风酒店 -->
+      <div class="htl">
+        <div class="str s1">⭐</div>
+        <div class="str s2">✨</div>
+        <div class="str s3">🌟</div>
+        <div class="roof"><span class="sign-txt">SHIWEI HOTEL</span></div>
+        <div class="bld">
+          <div class="win"></div><div class="win off"></div><div class="win"></div><div class="win"></div><div class="win off"></div><div class="win"></div><div class="win off"></div>
+          <div class="win"></div><div class="win"></div><div class="win off"></div><div class="win"></div><div class="win"></div><div class="win off"></div><div class="win"></div>
+          <div class="win off"></div><div class="win"></div><div class="win"></div><div class="win off"></div><div class="win"></div><div class="win"></div><div class="win off"></div>
+          <div class="win"></div><div class="win off"></div><div class="win"></div><div class="win"></div><div class="win off"></div><div class="win"></div><div class="win"></div>
+        </div>
+        <div class="base">
+          <div class="door"><div class="door-glass"></div></div>
+        </div>
+        <div class="ground"></div>
+        <div class="tree tree-l"><div class="tree-crown"></div><div class="tree-trunk"></div></div>
+        <div class="tree tree-r"><div class="tree-crown"></div><div class="tree-trunk"></div></div>
+      </div>
+
+      <div class="cs2">✨ 🏆 💎 ✨</div>
+    </div>
+    <div class="tt">士为大酒店</div>
+    <div class="ts">SHIWEI HOTEL &middot; INTERN SIMULATION</div>
+    <button class="bt" onclick="startGame()">开始实习</button>
+    <div class="tp">60秒限时挑战 &middot; 多个酒店事件 &middot; 你的选择决定结局</div>
+    <div class="sr2">
+      <button class="sb on" id="bgmBtn" onclick="toggleBGM()">🎵 背景音乐 ON</button>
+      <button class="sb on" id="sfxBtn" onclick="toggleSFX()">🔊 音效 ON</button>
+    </div>
+  </div>
+
+  <div id="gameScreen" class="hi">
+    <div class="hdr">
+      <div class="hn">🏨 士为大酒店<small>SHIWEI HOTEL</small></div>
+      <div class="sr3">
+        <div class="sb2"><span class="l">分数</span><span class="v vg" id="scoreEl">0</span></div>
+        <div class="sb2"><span class="l">满意度</span><span class="v" id="satisEl">50%</span></div>
+        <div class="sb2"><span class="l">声誉</span><span class="v" id="repEl">50</span></div>
+        <div class="sb2"><span class="l">已解决</span><span class="v" id="solvedEl">0</span></div>
+      </div>
+    </div>
+    <div class="tw">
+      <div class="tb"><div class="tbr" id="timerBar"></div></div>
+      <div class="tl">⏱ <span id="timerText">60</span> 秒</div>
+    </div>
+    <div class="main">
+      <div>
+        <div class="ql">📋 待处理事件 &middot; 点击处理</div>
+        <div class="eq" id="eventQueue"></div>
+      </div>
+      <div id="activeEventArea">
+        <div class="ne"><span class="ne2">⏳</span><div class="ne3">点击上方事件开始处理...</div></div>
+      </div>
+      <div class="lp">
+        <div class="lt">📝 实习日志</div>
+        <div class="ll" id="logList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cb3" id="comboDisplay">
+  <div class="cc" id="comboCount">0</div>
+  <div class="cl">连击</div>
+</div>
+<div class="sp" id="scorePopup"></div>
+<div class="combo-popup" id="comboPopup"></div>
+<div class="praise-banner" id="praiseBanner"></div>
+
+<div class="ov" id="endModal">
+  <div class="bx">
+    <div class="es" id="endingScene"></div>
+    <div class="me" id="endEmoji">🏆</div>
+    <div class="mt" id="endTitle">实习结束</div>
+    <div class="ms" id="endSub"></div>
+    <div class="ms2" id="endStats"></div>
+    <div class="br"><button class="btn bp" onclick="restartGame()">🔄 再来一次</button></div>
+  </div>
+</div>
+
+<script>
+/* ===== AUDIO ===== */
+var AudioCtx = window.AudioContext || window.webkitAudioContext;
+var audioCtx = null;
+var bgmOn = true;
+var sfxOn = true;
+var bgmTimer = null;
+
+function tryInitAudio() {
+  if (audioCtx) return;
+  try {
+    audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch(e) { audioCtx = null; }
+}
+tryInitAudio();
+
+function beep(freq, dur, type, vol) {
+  if (!audioCtx || !sfxOn) return;
+  try {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol || 0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+
+function playGreat()    { [400,500,600,500,700,600,800,700,1000,900,1200,1100,1400].forEach(function(f,i){setTimeout(function(){beep(f,0.08,'square',0.35);},i*55);}); }
+function playOK()      { beep(440,0.3,'sine',0.4); }
+function playBad()     { [300,250,200].forEach(function(f,i){setTimeout(function(){beep(f,0.3,'sawtooth',0.4);},i*150);}); }
+function playDisappointed(){ [300,250,200,150].forEach(function(f,i){setTimeout(function(){beep(f,0.5,'sawtooth',0.4);},i*200);}); }
+function playHappy()    { [523,659,784,880,1047].forEach(function(f,i){setTimeout(function(){beep(f,0.25,'sine',0.3);},i*120);}); }
+function playGood()     { beep(660,0.15,'sine',0.5); setTimeout(function(){beep(880,0.15,'sine',0.5);},80); }
+function playMiss()     { beep(250,0.3,'sawtooth',0.5); }
+function playUrgent()  { [440,440,440,560].forEach(function(f,i){setTimeout(function(){beep(f,0.2,'square',0.4);},i*150);}); }
+function playPraise()  { [528,659,792,1056].forEach(function(f,i){setTimeout(function(){beep(f,0.2,'sine',0.5);},i*80);}); }
+function playCombo()   { beep(880,0.1,'sine',0.5); setTimeout(function(){beep(1100,0.15,'sine',0.5);},80); }
+function playTimeout() { beep(200,0.4,'square',0.4); }
+
+/* ===== BGM: 轻快有节奏的8-bit旋律 ===== */
+/* 旋律: C-G-A-G | C-E-D2 | C-G-A-B | A-F-E-C | G-A-G-E | C-G-C5-C | ... */
+var _bgmSong = [
+  /* 小节1: C5 G5 A5 G5 */
+  523, 784, 659, 784,  523, 784, 659, 784,
+  /* 小节2: C5 E5 D5 */
+  523, 659, 587,  523, 659, 587,
+  /* 小节3: C5 G5 A5 B5 */
+  523, 784, 659, 988,  523, 784, 659, 988,
+  /* 小节4: A5 F5 E5 C5 */
+  880, 698, 659, 523,  880, 698, 659, 523,
+  /* 小节5: G5 A5 G5 E5 */
+  784, 880, 784, 659,  784, 880, 784, 659,
+  /* 小节6: C5 G5 C5 */
+  523, 784, 523,  523, 784, 523,
+  /* 小节7: rest, then G5 A5 B5 C6 */
+  0, 0, 0, 0,  784, 988, 1047, 1047,
+  /* 小节8: C6 B5 A5 G5 */
+  1047, 988, 880, 784,  1047, 988, 880, 784,
+  /* 小节9: C5 (final) */
+  523, 523, 523, 0,  523, 0, 523, 0
+];
+var _bgmIdx = 0;
+
+function playBGMBell(freq) {
+  if (!audioCtx || !bgmOn || freq === 0) return;
+  try {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.22);
+  } catch(e) {}
+}
+
+function startBGM() {
+  if (bgmTimer) return;
+  _bgmIdx = 0;
+  function tick() {
+    if (!bgmOn) return;
+    playBGMBell(_bgmSong[_bgmIdx % _bgmSong.length]);
+    _bgmIdx++;
+  }
+  tick();
+  bgmTimer = setInterval(tick, 280);
+}
+
+function stopBGM() {
+  if (bgmTimer) { clearInterval(bgmTimer); bgmTimer = null; }
+}
+
+function toggleBGM() {
+  bgmOn = !bgmOn;
+  var b = document.getElementById('bgmBtn');
+  if (bgmOn) {
+    b.innerHTML = '🎵 背景音乐 ON';
+    b.className = 'sb on';
+    startBGM();
+  } else {
+    b.innerHTML = '🎵 背景音乐 OFF';
+    b.className = 'sb';
+    stopBGM();
+  }
+}
+
+function toggleSFX() {
+  sfxOn = !sfxOn;
+  var b = document.getElementById('sfxBtn');
+  if (sfxOn) { b.innerHTML = '🔊 音效 ON'; b.className = 'sb on'; }
+  else { b.innerHTML = '🔇 音效 OFF'; b.className = 'sb'; }
+}
+
+/* ===== EVENTS - 重新设计每题加分上限10分 ===== */
+var EVENTS = [
+  {type:'c1',emoji:'📫',name:'办理入住',urgent:false,dialogue:'我预订了大床房，但信用卡好像刷不了了，能帮我看看吗？',guestName:'王先生',avatar:'👨',mood:'neutral',choices:[
+    {text:'微笑致歉，用心协助更换支付方式',score:10,satisfaction:8,reputation:5},
+    {text:'建议先付现金，稍后补刷信用卡',score:4,satisfaction:3,reputation:2},
+    {text:'让客人稍等，系统有点问题',score:-5,satisfaction:-10,reputation:-6}
+  ]},
+  {type:'c2',emoji:'📫',name:'预订出错',urgent:true,dialogue:'我明明预订了豪华套房，为什么给我的是普通房？还收我豪华套房的价！',guestName:'林太太',avatar:'👩',mood:'angry',choices:[
+    {text:'立即道歉，免费升级并退还差价',score:10,satisfaction:10,reputation:8},
+    {text:'查询订单记录，耐心解释预订平台的问题',score:4,satisfaction:3,reputation:3},
+    {text:'坚持说系统显示就是普通房，拒绝处理',score:-8,satisfaction:-12,reputation:-10}
+  ]},
+  {type:'c3',emoji:'📫',name:'加急入住',urgent:true,dialogue:'我赶时间！飞机晚了3小时，现在必须马上进房间休息！',guestName:'张总',avatar:'🏬',mood:'angry',choices:[
+    {text:'让游客马上进入房间并奉上欢迎饮品',score:10,satisfaction:10,reputation:8},
+    {text:'加急办理，但让客人稍等叫号',score:3,satisfaction:4,reputation:2},
+    {text:'正常排队办理，赶时间也不能例外',score:-5,satisfaction:-10,reputation:-6}
+  ]},
+  {type:'c4',emoji:'📫',name:'团队入住',urgent:false,dialogue:'我们公司20人团建，预订了10间房，请问能提前办理入住吗？',guestName:'赵经理',avatar:'👨',mood:'neutral',choices:[
+    {text:'提前准备好房卡，团队到达后快速分发',score:10,satisfaction:8,reputation:6},
+    {text:'安排专人引导，分批办理入住',score:6,satisfaction:6,reputation:4},
+    {text:'告知必须等到下午3点，按正常流程',score:0,satisfaction:-3,reputation:-2}
+  ]},
+  {type:'l1',emoji:'🔍',name:'费重物品遗失',urgent:true,dialogue:'我刚发现我那条金项链不见了！肯定是打扫时弄丢的！',guestName:'李女士',avatar:'👩',mood:'angry',choices:[
+    {text:'立即上报保安并调取监控，全程陪同',score:10,satisfaction:8,reputation:10},
+    {text:'沉着陪客人回房间仔细寻找',score:5,satisfaction:6,reputation:3},
+    {text:'让客人填个登记表就行',score:-8,satisfaction:-15,reputation:-12}
+  ]},
+  {type:'l2',emoji:'🟢',name:'行李丢失',urgent:true,dialogue:'我的行李箱不见了！托运时还好好的，你们航空公司弄丢的吗？',guestName:'孙先生',avatar:'👝',mood:'angry',choices:[
+    {text:'协助联系航空公司，同时提供备用洗漱用品',score:10,satisfaction:8,reputation:8},
+    {text:'让客人自行联系航空公司处理',score:-3,satisfaction:-6,reputation:-5},
+    {text:'推卸责任，称与酒店无关',score:-8,satisfaction:-12,reputation:-12}
+  ]},
+  {type:'l3',emoji:'💍',name:'戒指遗落',urgent:false,dialogue:'我老婆的结婚戒指落在床头柜了，我人已经在机场了，能帮我找找吗？',guestName:'刘先生',avatar:'👨',mood:'neutral',choices:[
+    {text:'立即去房间寻找，找到后快递给客人并承担运费',score:10,satisfaction:10,reputation:10},
+    {text:'去房间确认，告知客人后续处理方式',score:5,satisfaction:5,reputation:4},
+    {text:'让客人回来自己找',score:-5,satisfaction:-10,reputation:-8}
+  ]},
+  {type:'l4',emoji:'📱',name:'手机遗失',urgent:true,dialogue:'我手机不见了！最后印象是在你们餐厅吃的早餐！',guestName:'周小朋友',avatar:'👧',mood:'neutral',choices:[
+    {text:'调取餐厅监控，协助客人回忆行动路线',score:8,satisfaction:8,reputation:6},
+    {text:'让客人回忆是否落在其他地方',score:2,satisfaction:2,reputation:1},
+    {text:'告知酒店不负责客人个人物品保管',score:-8,satisfaction:-12,reputation:-10}
+  ]},
+  {type:'cp1',emoji:'😡',name:'噪音投诉',urgent:true,dialogue:'什么破酒店！半夜隔壁一直响，我根本没法睡！我现在要求全额退房！',guestName:'张总',avatar:'🤔',mood:'angry',choices:[
+    {text:'真诚道歉，免费升级套房并赠送果盘',score:10,satisfaction:10,reputation:10},
+    {text:'耐心倾听，耐心解释酒店政策，提供折扣券',score:3,satisfaction:-3,reputation:-2},
+    {text:'让客人出示噪音证据',score:-15,satisfaction:-18,reputation:-15}
+  ]},
+  {type:'cp2',emoji:'💿',name:'房间卫生差',urgent:true,dialogue:'你们房间卫生堪忧！床单上有头发，马桶也没刷干净！',guestName:'吴女士',avatar:'👩',mood:'angry',choices:[
+    {text:'真诚道歉，立即更换床单并彻底打扫，换赠水果',score:10,satisfaction:10,reputation:8},
+    {text:'道歉并解释打扫流程，承诺改进',score:3,satisfaction:3,reputation:2},
+    {text:'解释打扫流程正常，可能是上一位客人遗留',score:-8,satisfaction:-12,reputation:-10}
+  ]},
+  {type:'cp3',emoji:'🍽',name:'餐厅投诉',urgent:true,dialogue:'早餐太难吃了！而且我等了一个小时都没位置！',guestName:'隋先生',avatar:'👨',mood:'angry',choices:[
+    {text:'道歉并立即安排席位，免去早餐费用',score:10,satisfaction:10,reputation:8},
+    {text:'道歉并解释早餐高峰情况，引至其他餐厅',score:4,satisfaction:4,reputation:3},
+    {text:'告知早餐时间固定，客人需合理安排',score:-6,satisfaction:-10,reputation:-6}
+  ]},
+  {type:'cp4',emoji:'😠',name:'服务态度投诉',urgent:true,dialogue:'你们前司服务员态度极其恶劣！我要投诉！',guestName:'郑女士',avatar:'🏬',mood:'angry',choices:[
+    {text:'真诚道歉并承诺彻查，请客人填写投诉表',score:10,satisfaction:8,reputation:8},
+    {text:'解释服务员可能压力较大，请求客人谅解',score:0,satisfaction:-3,reputation:-3},
+    {text:'执拗说服务员有态度问题',score:-15,satisfaction:-15,reputation:-12}
+  ]},
+  {type:'cp5',emoji:'💰',name:'额外收费争议',urgent:false,dialogue:'我没用过你们吧，为什么要收我费用？这不是欺诈吗！',guestName:'王女士',avatar:'👧',mood:'neutral',choices:[
+    {text:'核销消单记录，如确非客人消费则全额退还',score:10,satisfaction:8,reputation:8},
+    {text:'耐心解释收费依据，出示消费记录',score:3,satisfaction:3,reputation:2},
+    {text:'坚持称系统记录无误，不予处理',score:-8,satisfaction:-12,reputation:-10}
+  ]},
+  {type:'f1',emoji:'🚿',name:'热水器故障',urgent:true,dialogue:'我房间热水器坏了！明天一早要开会，今晚必须洗澡！',guestName:'隋小朋友',avatar:'🏬',mood:'neutral',choices:[
+    {text:'立即安排换房并赠送次日早餐券',score:10,satisfaction:10,reputation:10},
+    {text:'联系工程部立即来修',score:5,satisfaction:5,reputation:2},
+    {text:'让客人客服自己克服一下',score:-8,satisfaction:-15,reputation:-12}
+  ]},
+  {type:'f2',emoji:'🔑',name:'门卡故障',urgent:true,dialogue:'我房门卡刷不开，试了好几次了，被锁在外面了！',guestName:'王先生',avatar:'👨',mood:'neutral',choices:[
+    {text:'立即带备用钥匙上门，同时联系工程部检查',score:10,satisfaction:10,reputation:8},
+    {text:'先让工程部来看看',score:3,satisfaction:3,reputation:2},
+    {text:'让客人再刷几次试试',score:-5,satisfaction:-10,reputation:-6}
+  ]},
+  {type:'f3',emoji:'❄️',name:'空调不制冷',urgent:true,dialogue:'空调一点都冷！35度的天我要热死了！',guestName:'刘先生',avatar:'👝',mood:'angry',choices:[
+    {text:'立即上门检修，如无法修好则换房并道歉',score:10,satisfaction:10,reputation:10},
+    {text:'电话指导客人调温度，仍不行再派人',score:4,satisfaction:3,reputation:2},
+    {text:'让客人自己看看是否温度设错了',score:-6,satisfaction:-10,reputation:-6}
+  ]},
+  {type:'f4',emoji:'📺',name:'电视无信号',urgent:false,dialogue:'电视没有信号，什么频道都看不了，孩子一直响！',guestName:'周妈妈',avatar:'👩',mood:'neutral',choices:[
+    {text:'立即上门排查故障，同时提供儿童娱乐方案',score:10,satisfaction:10,reputation:6},
+    {text:'电话指导重启电视顶盒',score:4,satisfaction:4,reputation:2},
+    {text:'让客人自己联系电视运营商',score:-4,satisfaction:-6,reputation:-5}
+  ]},
+  {type:'f5',emoji:'🐝',name:'马桶堵塞',urgent:true,dialogue:'马桶堵了！房间臭气熏天！我要换房！',guestName:'孙先生',avatar:'👝',mood:'angry',choices:[
+    {text:'立即安排换房，并赔偿房费折扣作为补偿',score:10,satisfaction:10,reputation:10},
+    {text:'联系维修人员前来疏通',score:4,satisfaction:4,reputation:2},
+    {text:'告知这是客人使用不当，需收取疏通费',score:-8,satisfaction:-12,reputation:-12}
+  ]},
+  {type:'e1',emoji:'⚠️',name:'火警演习',urgent:true,dialogue:'3楼走廊发现烟雾报警，请立即协助疏撒客人！',guestName:'保安部',avatar:'👮',mood:'angry',choices:[
+    {text:'立即启动紧急预案，通知工程部并协助疏撒',score:10,satisfaction:5,reputation:10},
+    {text:'先去现场查看情况再决定下一步',score:6,satisfaction:3,reputation:6},
+    {text:'让保安自己处理，我在这忙',score:-15,satisfaction:-10,reputation:-15}
+  ]},
+  {type:'e2',emoji:'🏥',name:'客人晕倒',urgent:true,dialogue:'大厅有位客人突然晕倒了！快来帮忙！',guestName:'服务员',avatar:'🍳',mood:'angry',choices:[
+    {text:'立即拨120，通知大厅经理，协助急救',score:10,satisfaction:8,reputation:10},
+    {text:'先过去查看情况再决定是否拨120',score:5,satisfaction:4,reputation:5},
+    {text:'让周围客人自己处理',score:-15,satisfaction:-10,reputation:-15}
+  ]},
+  {type:'e3',emoji:'⚡',name:'突然停电',urgent:true,dialogue:'整层楼突然停电！客人们都很恐慌！',guestName:'工程部',avatar:'👷',mood:'angry',choices:[
+    {text:'立即启动备用电源，上门安抚客人',score:10,satisfaction:8,reputation:10},
+    {text:'联系工程部拒绝修，同时电话安抚客人',score:6,satisfaction:4,reputation:6},
+    {text:'正在拒绝修，让客人独自等待',score:-4,satisfaction:-6,reputation:-5}
+  ]},
+  {type:'o1',emoji:'🗺',name:'问路咨询',urgent:false,dialogue:'请问到最近的地铁站怎么走？附近有好吃的地方推荐吗？',guestName:'游客',avatar:'👝',mood:'happy',choices:[
+    {text:'详细指路并推荐当地特色美食，手绘简易地图',score:8,satisfaction:10,reputation:6},
+    {text:'简单告知方向，让客人用手机导航',score:2,satisfaction:3,reputation:1},
+    {text:'我不是本地人，不知道',score:-3,satisfaction:-5,reputation:-3}
+  ]},
+  {type:'o2',emoji:'🚗',name:'叫车服务',urgent:false,dialogue:'我8点要去机场，能帮我叫个车吗？',guestName:'隋总',avatar:'🏬',mood:'neutral',choices:[
+    {text:'提前安排好专车并确认行程，准时候车',score:10,satisfaction:10,reputation:10},
+    {text:'帮叫出租车并确认到达时间',score:4,satisfaction:5,reputation:3},
+    {text:'告知叫车要找前司，自己打软件',score:-3,satisfaction:-6,reputation:-4}
+  ]},
+  {type:'o3',emoji:'🟢',name:'行李寄存',urgent:false,dialogue:'我晚上才离店，能帮我寄存行李吗？我还想去赶赶。',guestName:'郑先生',avatar:'👨',mood:'happy',choices:[
+    {text:'热情接待，免费寄存并推荐附近景点',score:10,satisfaction:10,reputation:8},
+    {text:'按规定寄存，行李房有空位',score:3,satisfaction:3,reputation:2},
+    {text:'告知没有行李寄存服务',score:-3,satisfaction:-6,reputation:-3}
+  ]},
+  {type:'o4',emoji:'⭐',name:'VIP接待',urgent:false,dialogue:'我是你们总经理的老朋友，今天来谈事情，麻烦安排一下。',guestName:'吴教授',avatar:'🏬',mood:'happy',choices:[
+    {text:'联系总经理确认后，按VIP标准接待',score:10,satisfaction:8,reputation:10},
+    {text:'立即按最高VIP标准接待不确定认',score:10,satisfaction:10,reputation:6},
+    {text:'请客人走正常流程排队',score:-3,satisfaction:-10,reputation:-5}
+  ]},
+  {type:'o5',emoji:'🍽',name:'餐厅投诉',urgent:true,dialogue:'这道菜里有虫子！恶死人了！我要见经理！',guestName:'孙太太',avatar:'👵',mood:'angry',choices:[
+    {text:'诚挚道歉，立即免单并通知厨房整改',score:10,satisfaction:10,reputation:10},
+    {text:'送一份甜品并打个折扣',score:4,satisfaction:5,reputation:2},
+    {text:'质疑虫子是否是客人自己放的',score:-15,satisfaction:-20,reputation:-18}
+  ]},
+  {type:'o6',emoji:'👗',name:'质疑预订',urgent:true,dialogue:'我订好的房间告诉你没房了！！我从外地飞过来的！',guestName:'刘先生',avatar:'👝',mood:'angry',choices:[
+    {text:'安排附近同星级酒店并派车送过去',score:10,satisfaction:10,reputation:10},
+    {text:'提供免费升级套房日延迟退房',score:6,satisfaction:6,reputation:4},
+    {text:'退款让客人自己解决',score:-15,satisfaction:-18,reputation:-15}
+  ]},
+  {type:'o7',emoji:'🟢',name:'提前退房',urgent:false,dialogue:'我要提前到下午3点退房，行李能帮我存一下吗？',guestName:'周小朋友',avatar:'👧',mood:'neutral',choices:[
+    {text:'免费寄存行李并开据凭据，告知客人安全存放',score:10,satisfaction:10,reputation:6},
+    {text:'提供行李寄存服务，收取少量费用',score:2,satisfaction:-3,reputation:0},
+    {text:'拒绝，称行李房已满',score:-4,satisfaction:-8,reputation:-5}
+  ]},
+  {type:'n1',emoji:'🚗',name:'停车纠纷',urgent:true,dialogue:'客人开车到店，车被其他车位车辆刮擦，前台来帮忙。',guestName:'隋女士',avatar:'👩',mood:'neutral',choices:[
+    {text:'告知客人属于私人约约，酒店不负责',score:-3,satisfaction:-6,reputation:-5},
+    {text:'安抚客人，协助调取监控，联系安保协赔处理',score:10,satisfaction:10,reputation:10},
+    {text:'直接让客人报警，前司不与任何协助',score:-8,satisfaction:-12,reputation:-10}
+  ]},
+  {type:'n2',emoji:'🐕',name:'宠物入住',urgent:true,dialogue:'客人携带宠物犬前来办理入住，酒店规定禁止宠物入内。',guestName:'孙先生',avatar:'👨',mood:'neutral',choices:[
+    {text:'直接拒绝客人，不允许进店',score:-5,satisfaction:-8,reputation:-6},
+    {text:'礼貌说明酒店禁宠规定，推荐附近宠物寄存',score:10,satisfaction:8,reputation:8},
+    {text:'偷偷允许带入房间，不做记录',score:-8,satisfaction:-10,reputation:-12}
+  ]},
+  {type:'n3',emoji:'🔑',name:'房卡遗失',urgent:false,dialogue:'客人不慎遗失房卡，担心房间安全，前来报备。',guestName:'黄小朋友',avatar:'👧',mood:'neutral',choices:[
+    {text:'直接补办，不收取任何工本费',score:4,satisfaction:4,reputation:2},
+    {text:'礼貌告知房卡补办流程，收取合理工本费，注销旧卡',score:10,satisfaction:8,reputation:8},
+    {text:'不予补办，让客人继续使用旧卡',score:-6,satisfaction:-10,reputation:-8}
+  ]},
+  {type:'n4',emoji:'🎉',name:'婚宴临时加桌',urgent:true,dialogue:'婚宴现场客人超出预估，需要临时增加2桌席位。',guestName:'婚宴主办方',avatar:'👰',mood:'neutral',choices:[
+    {text:'直接拒绝，场地已悉布布置完成无法改动',score:-5,satisfaction:-10,reputation:-6},
+    {text:'快速对接宴会主管，评估场地条件，协商加桌事宜',score:10,satisfaction:10,reputation:10},
+    {text:'答应加桌，但不确认场地，后续造成混乱',score:-8,satisfaction:-12,reputation:-10}
+  ]},
+  {type:'n5',emoji:'😵',name:'客人醉酒闹事',urgent:true,dialogue:'客人饮酒过量，在大厅大声喧哗，影响其他住客。',guestName:'醉酒男士',avatar:'🧔',mood:'angry',choices:[
+    {text:'大声囔囔无效，制止客人喧哗',score:-6,satisfaction:-8,reputation:-8},
+    {text:'温和引导，联系安保，必要时联系家属，避免冲突',score:10,satisfaction:8,reputation:10},
+    {text:'置之不理，任由客人在大厅喧哗',score:-4,satisfaction:-6,reputation:-6}
+  ]},
+  {type:'n6',emoji:'🧺',name:'洗衣服务投诉',urgent:false,dialogue:'客人送洗的西装被洗坏，前来前台投诉要求赔偿。',guestName:'马先生',avatar:'👨',mood:'neutral',choices:[
+    {text:'推脱说衣物本身质量问题，拒绝赔偿',score:-5,satisfaction:-10,reputation:-8},
+    {text:'耐心核实情况，按照酒店洗衣服务规则协商赔偿方案',score:10,satisfaction:8,reputation:8},
+    {text:'直接全额赔偿，不做任何核实',score:3,satisfaction:4,reputation:3}
+  ]},
+  {type:'n7',emoji:'🕐',name:'客人晚到延后入住',urgent:false,dialogue:'客人预订房间，但凌晨2点才抵达酒店。',guestName:'何女士',avatar:'👩',mood:'neutral',choices:[
+    {text:'直接取消订单，房间已释放',score:-8,satisfaction:-12,reputation:-10},
+    {text:'确认预订保留状态，正常办理入住，提醒注意时段安全',score:10,satisfaction:10,reputation:8},
+    {text:'以下班为由，拒绝办理入住',score:-6,satisfaction:-10,reputation:-8}
+  ]},
+  {type:'n8',emoji:'🌫',name:'房间烟味过重',urgent:true,dialogue:'客人入住后发现房间残留浓重烟味，无法忍受。',guestName:'方先生',avatar:'👨',mood:'angry',choices:[
+    {text:'告知酒店无法处理，将就入住',score:-6,satisfaction:-10,reputation:-6},
+    {text:'诚挚道歉，协商更换无烟房，做好房间通风除味',score:10,satisfaction:10,reputation:10},
+    {text:'指摘客人过于挑剔，不予处理',score:-15,satisfaction:-12,reputation:-12}
+  ]},
+  {type:'n9',emoji:'💬',name:'访客登记',urgent:false,dialogue:'住客想要带朋友进入客房探望，没携带身份证件。',guestName:'住客老周',avatar:'👨',mood:'neutral',choices:[
+    {text:'直接允许访客上楼，不做记录',score:-6,satisfaction:-8,reputation:-6},
+    {text:'告知访客登记制度，引导访客完成登记再上楼',score:10,satisfaction:8,reputation:8},
+    {text:'禁止访客进入，无论任何情况',score:-4,satisfaction:-6,reputation:-5}
+  ]},
+  {type:'n10',emoji:'☂️',name:'雨伞借用',urgent:false,dialogue:'外面突降大雨，客人前来前台想借用雨伞。',guestName:'游客',avatar:'👝',mood:'happy',choices:[
+    {text:'雨伞不外借，让客人自己想办法',score:-4,satisfaction:-6,reputation:-5},
+    {text:'办理雨伞借用登记，告知归还要求',score:8,satisfaction:8,reputation:8},
+    {text:'直接把雨伞送给客人，不做记录',score:2,satisfaction:3,reputation:2}
+  ]},
+  {type:'n11',emoji:'📄',name:'客人遗失发票',urgent:false,dialogue:'客人已经离店，来电想要补开住宿发票。',guestName:'郑总',avatar:'🏬',mood:'neutral',choices:[
+    {text:'告知离店后不能再开据发票',score:-4,satisfaction:-6,reputation:-5},
+    {text:'核对订单信息，引导客人线上申请补开发票',score:10,satisfaction:10,reputation:8},
+    {text:'随意开据发票，不核对消费记录',score:-8,satisfaction:-10,reputation:-10}
+  ]},
+  {type:'n12',emoji:'🧒',name:'儿童走失预警',urgent:true,dialogue:'家长着急跑来，说孩子在酒店大厅走失。',guestName:'家长',avatar:'👩',mood:'angry',choices:[
+    {text:'让家长自己到处寻找，前司不帮忙',score:-15,satisfaction:-12,reputation:-12},
+    {text:'立即通知安保，调取监控，广播协助寻找小朋友',score:10,satisfaction:10,reputation:10},
+    {text:'先处理手上业务，有空再帮忙寻找',score:-5,satisfaction:-8,reputation:-6}
+  ]},
+  {type:'n13',emoji:'🍸',name:'迷你吧饮品争议',urgent:false,dialogue:'客人喊冤房间迷你吧饮品，退房时产生争议。',guestName:'小吴',avatar:'👨',mood:'neutral',choices:[
+    {text:'强制性要求客人必须全额付费',score:-8,satisfaction:-12,reputation:-10},
+    {text:'核实情况，耐心讲解迷你吧收费规则，协商处理',score:10,satisfaction:8,reputation:6},
+    {text:'直接免除费用，不做任何记录',score:2,satisfaction:3,reputation:2}
+  ]},
+  {type:'n14',emoji:'🏊',name:'温泉预约纠结',urgent:false,dialogue:'客人预订酒店温泉，到达后发现已满员。',guestName:'林女士',avatar:'👩',mood:'neutral',choices:[
+    {text:'直接告知满员，没有解决方案',score:-5,satisfaction:-8,reputation:-6},
+    {text:'道歉，提供其他时段预订，提供备选休息方案',score:10,satisfaction:10,reputation:8},
+    {text:'强行安排客人进入，造成现场拥挤',score:-15,satisfaction:-12,reputation:-12}
+  ]},
+  {type:'n15',emoji:'🌏',name:'外籍客人紧急求助',urgent:false,dialogue:'外籍客人不会中文，问问酒店WiFi密码。',guestName:'外籍游客',avatar:'👝',mood:'neutral',choices:[
+    {text:'抬手表示听不懂，不予回应',score:-8,satisfaction:-10,reputation:-8},
+    {text:'用简单英文告知WiFi名称密码，协助连接网络',score:10,satisfaction:10,reputation:10},
+    {text:'告知客人没有免费WiFi',score:-4,satisfaction:-6,reputation:-5}
+  ]},
+  {type:'n16',emoji:'⏰',name:'退房时物品遗落',urgent:true,dialogue:'客人已经退房离开，来电说把贵重手表落在床头柜。',guestName:'已退房孙先生',avatar:'👨',mood:'neutral',choices:[
+    {text:'表示房间已悉打正理，无法查找',score:-15,satisfaction:-12,reputation:-12},
+    {text:'立即通知客房部去房间核实，登记失物信息',score:10,satisfaction:8,reputation:10},
+    {text:'随便回复"找过了没有"，实际没有去查看',score:-15,satisfaction:-15,reputation:-15}
+  ]},
+  {type:'n17',emoji:'⚠️',name:'电梯故障',urgent:true,dialogue:'有客人被因在电梯里，通过对讲呼叫前司求助。',guestName:'被因电梯的住客',avatar:'👨',mood:'angry',choices:[
+    {text:'让客人独自等待工程部到来',score:-8,satisfaction:-10,reputation:-8},
+    {text:'第一时间安抚被因客人，立即通知工程部紧急救援',score:10,satisfaction:10,reputation:10},
+    {text:'挂断对讲，继续接待其他客人',score:-15,satisfaction:-15,reputation:-15}
+  ]},
+  {type:'n18',emoji:'🍳',name:'早餐超时',urgent:false,dialogue:'客人迟到，早餐已结束，想要吃早餐。',guestName:'肖先生',avatar:'👨',mood:'neutral',choices:[
+    {text:'直接拒绝，早餐时间已结束',score:-4,satisfaction:-6,reputation:-5},
+    {text:'礼貌说明早餐结束时间，提供简易点心补偿',score:10,satisfaction:10,reputation:6},
+    {text:'私自放开早餐，违反酒店制度',score:-15,satisfaction:-12,reputation:-12}
+  ]},
+  {type:'n19',emoji:'🔔',name:'装修噪音投诉',urgent:true,dialogue:'酒店内部装修施工，附近房间持续施工噪音，客人无法休息。',guestName:'叶女士',avatar:'👩',mood:'angry',choices:[
+    {text:'告知客人施工是必要工作，只能隐忍',score:-6,satisfaction:-10,reputation:-6},
+    {text:'道歉，协商工程部调整施工时间，可提供换房选项',score:10,satisfaction:10,reputation:10},
+    {text:'和客人争议，说施工不会影响休息',score:-15,satisfaction:-12,reputation:-12}
+  ]},
+  {type:'n20',emoji:'⏰',name:'客人延时退房',urgent:false,dialogue:'客人想要延时到下午3点退房，超出酒店正常退房时间。',guestName:'孟总',avatar:'🏬',mood:'neutral',choices:[
+    {text:'直接拒绝，必须12点准时退房',score:-4,satisfaction:-6,reputation:-5},
+    {text:'查询房态，说明延时退房规则，可协商收费或免费延时',score:10,satisfaction:8,reputation:6},
+    {text:'无条件同意延时，不查询房间后续预订',score:-8,satisfaction:-12,reputation:-10}
+  ]},
+];
+
+/* ===== PRAISE BANNER ===== */
+var PRAISE_DATA = [
+  {text:'美团客人发表了赞不绝口的好评！点击领取奖励！', color:'#4fc3f7'},
+  {text:'抖音红人发布了推荐入住本酒店的视频！点击领取奖励！', color:'#81c784'},
+  {text:'大众点评客人给了五星好评！点击领取奖励！', color:'#f4d03f'},
+];
+var PRAISE_REWARDS = [5, 10, 15, 20];
+
+function showPraiseBanner() {
+  if (!state || state.finished) return;
+  var el = document.getElementById('praiseBanner');
+  if (!el) return;
+  var pe = PRAISE_DATA[Math.floor(Math.random() * PRAISE_DATA.length)];
+  var reward = PRAISE_REWARDS[Math.floor(Math.random() * PRAISE_REWARDS.length)];
+  var dir = Math.floor(Math.random() * 4);
+  var speed = reward >= 15 ? '3s' : reward >= 10 ? '5s' : '7s';
+  el.innerHTML = pe.text + ' <span style="font-size:18px">' + reward + '分</span>';
+  el.style.background = pe.color;
+  el.style.setProperty('--speed', speed);
+  el.className = 'praise-banner d' + dir;
+  el.style.display = 'block';
+  el.style.left = ''; el.style.right = ''; el.style.top = ''; el.style.bottom = ''; el.style.transform = '';
+  if (dir === 0) { el.style.left = '-260px'; el.style.top = (15 + Math.random() * 50) + '%'; }
+  else if (dir === 1) { el.style.right = '-260px'; el.style.top = (15 + Math.random() * 50) + '%'; }
+  else if (dir === 2) { el.style.top = '-60px'; el.style.left = '50%'; el.style.transform = 'translateX(-50%)'; }
+  else { el.style.bottom = '-60px'; el.style.top = 'auto'; el.style.left = '50%'; el.style.transform = 'translateX(-50%)'; }
+  el.onclick = function() { collectPraise(reward); };
+  setTimeout(function() { if (el) el.style.display = 'none'; }, 7000);
+}
+
+function collectPraise(reward) {
+  var el = document.getElementById('praiseBanner');
+  if (!el || el.style.display === 'none') return;
+  el.style.display = 'none';
+  state.score += reward;
+  state.satisfaction = clamp(state.satisfaction + Math.floor(reward / 2), 0, 100);
+  state.reputation = clamp(state.reputation + Math.floor(reward / 3), 0, 100);
+  showPopup('+' + reward + '分', '#4fc3f7');
+  log('✓ [好评事件] 点赞 +' + reward + '分', 'pos');
+  playPraise();
+  updateStats();
+}
+
+/* ===== GAME STATE ===== */
+var state = null;
+var _eid = 0;
+var _recent = [];
+var _praiseTimer = null;
+var _eventTimer = null;
+var _eventCountdown = null;
+
+function clamp(v, mn, mx) { return Math.max(mn, Math.min(mx, v)); }
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function makeEvent() {
+  var pool = EVENTS.filter(function(e) { return _recent.indexOf(e.type) === -1; });
+  if (pool.length === 0) pool = EVENTS;
+  var t = pool[Math.floor(Math.random() * pool.length)];
+  _recent.push(t.type);
+  if (_recent.length > 4) _recent.shift();
+  var moods = ['neutral', 'angry', 'happy'];
+  return {
+    id: 'e' + (++_eid),
+    type: t.type, emoji: t.emoji, name: t.name, dialogue: t.dialogue,
+    guestName: t.guestName, avatar: t.avatar,
+    mood: moods[Math.floor(Math.random() * moods.length)],
+    urgent: t.urgent,
+    shuffledChoices: shuffle(t.choices.map(function(c, i) {
+      return { text: c.text, score: c.score, satisfaction: c.satisfaction, reputation: c.reputation, origIdx: i };
+    }))
+  };
+}
+
+/* ===== EVENT TIMEOUT ===== */
+function startEventTimer() {
+  clearEventTimer();
+  if (!state || !state.activeEvent) return;
+  var ev = state.activeEvent;
+  var limit = ev.urgent ? 5 : 10;
+  var penalty = ev.urgent ? -10 : -5;
+  var satPenalty = ev.urgent ? -15 : -8;
+  _eventCountdown = limit;
+  updateCountdownUI();
+  _eventTimer = setInterval(function() {
+    _eventCountdown--;
+    updateCountdownUI();
+    if (_eventCountdown <= 0) {
+      clearEventTimer();
+      handleTimeout(penalty, satPenalty, ev.urgent);
+    }
+  }, 1000);
+}
+
+function updateCountdownUI() {
+  var tip = document.getElementById('eventCountdown');
+  if (!tip) return;
+  tip.style.display = (_eventCountdown !== null && _eventCountdown <= 3) ? 'block' : 'none';
+  if (tip.style.display === 'block') tip.innerText = '还剩' + _eventCountdown + '秒';
+}
+
+function clearEventTimer() {
+  if (_eventTimer) { clearInterval(_eventTimer); _eventTimer = null; }
+  _eventCountdown = null;
+  var tip = document.getElementById('eventCountdown');
+  if (tip) tip.style.display = 'none';
+}
+
+function handleTimeout(penalty, satPenalty, isUrgent) {
+  if (!state || !state.activeEvent || state.finished) return;
+  var ev = state.activeEvent;
+  state.score += penalty;
+  state.satisfaction = clamp(state.satisfaction + satPenalty, 0, 100);
+  state.reputation = clamp(state.reputation + (isUrgent ? -8 : -4), 0, 100);
+  state.combo = 0;
+  showCombo(0);
+  showPopup(penalty + '分', '#e57373');
+  playTimeout();
+  triggerShake();
+  log('[' + ev.name + '] ⏱ 超时未答 (' + penalty + '分)', 'neg');
+  state.events = state.events.filter(function(ee) { return ee.id !== ev.id; });
+  state.activeEvent = null;
+  updateStats(); renderQueue(); renderActive(); ensureQueue();
+}
+
+/* ===== RENDER ===== */
+function renderQueue() {
+  var q = document.getElementById('eventQueue');
+  if (!q) return;
+  if (state.events.length === 0) { q.innerHTML = '<div style="color:#888;font-size:11px;padding:8px;">⏳ 事件生成中...</div>'; return; }
+  var html = '';
+  for (var i = 0; i < state.events.length; i++) {
+    var ev = state.events[i];
+    var cls = ev.urgent ? ' ec ur' : ' ec';
+    var badge = ev.urgent ? '<span class="cb cbu">⏱紧急</span>' : '<span class="cb cbn">📋常见</span>';
+    html += '<div class="' + cls + '" onclick="selectEvent(\'' + ev.id + '\')">' + badge +
+      '<div class="cy">' + ev.emoji + '</div><div class="ct">' + ev.name + '</div><div class="cs3">' + ev.guestName + '</div></div>';
+  }
+  q.innerHTML = html;
+}
+
+function renderActive() {
+  var area = document.getElementById('activeEventArea');
+  if (!area) return;
+  if (!state.activeEvent) { area.innerHTML = '<div class="ne"><span class="ne2">⏳</span><div class="ne3">点击上方事件开始处理...</div></div>'; return; }
+  var ev = state.activeEvent;
+  var mc = ev.mood === 'angry' ? ' ma' : ev.mood === 'happy' ? ' mh' : ' mn';
+  var mt = ev.mood === 'angry' ? '😠 生气' : ev.mood === 'happy' ? '😺 满意' : '😐 平静';
+  var countdownTip = '<div id="eventCountdown" class="countdown-tip" style="display:none"></div>';
+  var ch = '';
+  for (var i = 0; i < ev.shuffledChoices.length; i++) { ch += '<button class="cb2" onclick="handleChoice(' + i + ')">' + ev.shuffledChoices[i].text + '</button>'; }
+  area.innerHTML = countdownTip + '<div class="ae"><div class="ah"><div class="af">' + ev.avatar + '</div>' +
+    '<div><div class="at">' + ev.emoji + ' ' + ev.name + '</div>' +
+    '<div class="an">' + ev.guestName + '</div>' +
+    '<div class="am' + mc + '">' + mt + '</div></div></div>' +
+    '<div class="ad">💬 "' + ev.dialogue + '"</div>' +
+    '<div class="chs">' + ch + '</div></div>';
+}
+
+function updateStats() {
+  var el = document.getElementById('scoreEl');
+  if (el) el.innerText = state.score;
+  var sat = clamp(state.satisfaction, 0, 100);
+  el = document.getElementById('satisEl');
+  if (el) { el.innerText = sat + '%'; el.className = 'v ' + (sat >= 50 ? '' : 'vr'); }
+  el = document.getElementById('repEl');
+  if (el) { el.innerText = clamp(state.reputation, 0, 100); el.className = 'v ' + (state.reputation >= 50 ? '' : 'vr'); }
+  el = document.getElementById('solvedEl');
+  if (el) el.innerText = state.solved;
+  var pct = (state.timeLeft / 60) * 100;
+  el = document.getElementById('timerBar');
+  if (el) { el.style.width = pct + '%'; el.className = 'tbr' + (pct <= 25 ? ' low' : pct <= 50 ? ' mid' : ''); }
+  el = document.getElementById('timerText');
+  if (el) el.innerText = state.timeLeft;
+}
+
+function showPopup(txt, color) {
+  var p = document.getElementById('scorePopup');
+  if (!p) return;
+  p.innerText = txt; p.style.color = color; p.className = 'sp';
+  void p.offsetWidth; p.className = 'sp anim';
+}
+
+function showComboPopup(txt) {
+  var p = document.getElementById('comboPopup');
+  if (!p) return;
+  p.innerText = txt; p.className = 'combo-popup';
+  void p.offsetWidth; p.className = 'combo-popup anim';
+}
+
+function triggerShake() {
+  document.body.className = '';
+  void document.body.offsetWidth;
+  document.body.className = 'sh';
+  setTimeout(function() { document.body.className = ''; }, 600);
+}
+
+function triggerFlash(type) {
+  var el = document.querySelector('.ae');
+  if (!el) return;
+  void el.offsetWidth;
+  el.className = 'ae ' + (type === 'good' ? 'fl-g' : 'fl-r');
+  setTimeout(function() { if (el) el.className = 'ae'; }, 400);
+}
+
+function showCombo(c) {
+  var cd = document.getElementById('comboDisplay');
+  if (!cd) return;
+  if (c < 2) { cd.style.display = 'none'; return; }
+  var el = document.getElementById('comboCount');
+  if (el) el.innerText = c;
+  cd.style.display = 'block';
+  cd.style.animation = 'none';
+  void cd.offsetWidth;
+  cd.style.animation = 'cbi .3s ease-out';
+}
+
+function log(text, type) {
+  var list = document.getElementById('logList');
+  if (!list) return;
+  var item = document.createElement('div');
+  item.className = 'li ' + (type || '');
+  item.innerText = text;
+  if (list.firstChild) list.insertBefore(item, list.firstChild);
+  else list.appendChild(item);
+  while (list.children.length > 20) list.removeChild(list.lastChild);
+}
+
+function ensureQueue() { while (state.events.length < 5) state.events.push(makeEvent()); renderQueue(); }
+
+function selectEvent(id) {
+  if (state.finished) return;
+  var ev = null;
+  for (var i = 0; i < state.events.length; i++) { if (state.events[i].id === id) { ev = state.events[i]; break; } }
+  if (!ev) return;
+  state.activeEvent = ev;
+  if (ev.urgent) playUrgent();
+  renderActive();
+  startEventTimer();
+}
+
+function handleChoice(idx) {
+  if (state.finished || !state.activeEvent) return;
+  clearEventTimer();
+  var ev = state.activeEvent;
+  var c = ev.shuffledChoices[idx];
+  var bonus = 0;
+  if (c.score > 0) { state.combo++; state.bestCombo = Math.max(state.bestCombo, state.combo); bonus = state.combo * 2; }
+  else { state.combo = 0; }
+  state.score += c.score + bonus;
+  state.satisfaction = clamp(state.satisfaction + c.satisfaction, 0, 100);
+  state.reputation = clamp(state.reputation + c.reputation, 0, 100);
+  state.solved++;
+  showCombo(state.combo);
+  var total = c.score + bonus;
+  var color = total > 0 ? '#81c784' : total < 0 ? '#e57373' : '#888';
+  showPopup((total > 0 ? '+' : '') + total + '分', color);
+  if (bonus > 0) showComboPopup('+' + bonus + '分');
+  if (c.score > 0) { playGood(); triggerFlash('good'); }
+  else if (c.score < 0) { playMiss(); triggerShake(); triggerFlash('bad'); }
+  if (state.combo >= 3) playCombo();
+  log('[' + ev.name + '] ' + (c.score > 0 ? '👍' : '') + (c.score < 0 ? '😥' : '') +
+    ' (' + (c.score > 0 ? '+' : '') + c.score + (bonus > 0 ? '+' + bonus : '') + '分)',
+    c.score > 0 ? 'pos' : c.score < 0 ? 'neg' : '');
+  state.events = state.events.filter(function(ee) { return ee.id !== ev.id; });
+  state.activeEvent = null;
+  updateStats(); renderQueue(); renderActive(); ensureQueue();
+}
+
+function startGame() {
+  tryInitAudio();
+  state = { score: 0, satisfaction: 50, reputation: 50, solved: 0, timeLeft: 60, events: [], activeEvent: null, combo: 0, bestCombo: 0, finished: false, timerID: null, spawnID: null };
+  _eid = 0; _recent = [];
+  document.getElementById('startScreen').className = 'sr hi';
+  document.getElementById('gameScreen').className = '';
+  document.getElementById('endModal').className = 'ov';
+  document.getElementById('logList').innerHTML = '';
+  var cd = document.getElementById('comboDisplay');
+  if (cd) cd.style.display = 'none';
+  var pb = document.getElementById('praiseBanner');
+  if (pb) pb.style.display = 'none';
+  updateStats(); ensureQueue();
+  setTimeout(function() { if (state.events.length > 0 && !state.activeEvent) selectEvent(state.events[0].id); }, 300);
+  log('🏅 60秒开始！加油！', 'gold');
+  if (bgmOn) startBGM();
+  state.timerID = setInterval(function() { state.timeLeft--; updateStats(); if (state.timeLeft <= 0) endGame(); }, 1000);
+  state.spawnID = setInterval(function() {
+    if (!state.finished) {
+      if (Math.random() < 0.35 && state.events.length > 2) state.events.splice(Math.floor(Math.random() * state.events.length), 1);
+      ensureQueue();
+    }
+  }, 2500);
+  schedulePraise();
+}
+
+function schedulePraise() {
+  if (state.finished) return;
+  _praiseTimer = setTimeout(function() { if (!state.finished) showPraiseBanner(); schedulePraise(); }, 8000 + Math.floor(Math.random() * 7000));
+}
+
+/* ===== ENDINGS - 修正后的分级 ===== */
+var ENDINGS = [
+  { minScore: 500, stars: 5, title: '5星传奇实习生', sub: '你的表现算得上传奇！总经理当场决定跳过试用期，直接录取为正式员工，并授予"最佳服务之星"殊荣！', emoji: '👍', sceneColor: '#f4d03f' },
+  { minScore: 400, stars: 4, title: '4星传奇实习生', sub: '你的表现算得上传奇！总经理当场决定跳过试用期，直接录取为正式员工，并授予"最佳服务之星"殊荣！', emoji: '👍', sceneColor: '#f4d03f' },
+  { minScore: 300, stars: 3, title: '3星传奇实习生', sub: '你的表现算得上传奇！总经理当场决定跳过试用期，直接录取为正式员工，并授予"最佳服务之星"殊荣！', emoji: '👍', sceneColor: '#f4d03f' },
+  { minScore: 200, stars: 2, title: '2星传奇实习生', sub: '你的表现算得上传奇！总经理当场决定跳过试用期，直接录取为正式员工，并授予"最佳服务之星"殊荣！', emoji: '👍', sceneColor: '#f4d03f' },
+  { minScore: 100, stars: 1, title: '1星传奇实习生', sub: '你的表现算得上传奇！总经理当场决定跳过试用期，直接录取为正式员工，并授予"最佳服务之星"殊荣！', emoji: '👍', sceneColor: '#f4d03f' },
+  { minScore: 91,  title: '⭐ 优秀实习生', sub: '你的服务意识和技巧都表现优异！带队老师给了你极高的评价，并推荐你参加集团优秀员工评选。', emoji: '⭐', sceneColor: '#4fc3f7' },
+  { minScore: 71,  title: '👍 实习合格', sub: '你顺利完成了实习任务，基本素质良好。继续努力，下次表现会更好！', emoji: '👍', sceneColor: '#81c784' },
+  { minScore: 60,  title: '🙃 勉强及格', sub: '你的表现差强人意，有些地方还需要改进。不要气馁，多积累经验会越来越好的！', emoji: '🙃', sceneColor: '#ffb74d' },
+  { minScore: -9999, title: '😫 实习不及格', sub: '很遗憾，这次实习表现未达到基本要求。也许酒店产业不太适合你，建议考虑其他方向。', emoji: '😫', sceneColor: '#e57373' },
+];
+
+function endGame() {
+  if (state.finished) return;
+  state.finished = true;
+  clearEventTimer();
+  if (state.timerID) clearInterval(state.timerID);
+  if (state.spawnID) clearInterval(state.spawnID);
+  if (_praiseTimer) clearTimeout(_praiseTimer);
+  stopBGM();
+  var pb = document.getElementById('praiseBanner');
+  if (pb) pb.style.display = 'none';
+  var en = ENDINGS[ENDINGS.length - 1];
+  for (var i = 0; i < ENDINGS.length; i++) { if (state.score >= ENDINGS[i].minScore) { en = ENDINGS[i]; break; } }
+  var emojiEl = document.getElementById('endEmoji');
+  if (en.stars) {
+    var medals = '';
+    for (var mi = 0; mi < en.stars; mi++) medals += '<span class="md">🏅</span>';
+    var rowCls = 'mr' + (en.stars >= 5 ? ' mr5' : '');
+    document.getElementById('endingScene').innerHTML =
+      '<div class="tf">' + en.emoji + '</div><div class="' + rowCls + '">' + medals + '</div>';
+    emojiEl.innerText = '';
+    emojiEl.style.display = 'none';
+  } else {
+    document.getElementById('endingScene').innerHTML = '<div style="font-size:72px">' + en.emoji + '</div>';
+    emojiEl.innerText = en.emoji;
+    emojiEl.style.display = '';
+  }
+  document.getElementById('endTitle').innerText = en.title;
+  document.getElementById('endSub').innerText = en.sub;
+  var scene = document.getElementById('endingScene');
+  scene.style.background = '#1a1a2e';
+  scene.style.border = '2px solid ' + en.sceneColor;
+  scene.style.color = en.sceneColor;
+  var sat = clamp(state.satisfaction, 0, 100);
+  var rep = clamp(state.reputation, 0, 100);
+  document.getElementById('endStats').innerHTML =
+    '<div class="mst"><span class="l">最终分数</span><span class="v">' + state.score + '</span></div>' +
+    '<div class="mst"><span class="l">解决事件</span><span class="v vg">' + state.solved + '件</span></div>' +
+    '<div class="mst"><span class="l">客户满意度</span><span class="v ' + (sat >= 50 ? 'vg' : 'vr') + '">' + sat + '%</span></div>' +
+    '<div class="mst"><span class="l">酒店声望</span><span class="v ' + (rep >= 50 ? 'vg' : 'vr') + '">' + rep + '</span></div>' +
+    '<div class="mst"><span class="l">最佳连击</span><span class="v">' + state.bestCombo + '连击</span></div>';
+  document.getElementById('endModal').className = 'ov ac';
+  if (state.score >= 100) { playGreat(); }
+  else if (state.score >= 91)  { playGreat(); }
+  else if (state.score >= 71)  { playOK(); }
+  else if (state.score >= 60)  { playBad(); }
+  else { playBad(); playDisappointed(); }
+}
+
+function restartGame() { document.getElementById('endModal').className = 'ov'; startGame(); }
+
+function onFirstClick() {
+  tryInitAudio();
+  if (bgmOn && audioCtx && audioCtx.state === 'running') startBGM();
+  if (document.removeEventListener) document.removeEventListener('click', onFirstClick);
+}
+if (document.addEventListener) document.addEventListener('click', onFirstClick, false);
+</script>
+</body>
+</html>
